@@ -1,0 +1,15 @@
+# backend/.air.toml
+
+[build]
+  cmd = "go build -o tmp/api cmd/api/main.go"
+  bin = "tmp/api"
+  full_bin = "tmp/api"
+  include_ext = ["go"]
+  exclude_dir = ["tmp", "vendor"]
+  exclude_file = []
+  delay = 1000
+  log = "stdout"
+  send_interrupt = true
+
+[log]
+  time = true

@@ -1,0 +1,52 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: docker/dev/Dockerfile
+    container_name: ecommerce-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - ecommerce
+    volumes:
+      - ./backend:/app
+      - /app/tmp         # evita sobrescrever o bin gerado pelo air
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: docker/dev/Dockerfile
+    container_name: ecommerce-frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - ecommerce
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app        # mapeia a pasta local no container
+      - /app/node_modules      # evita sobrescrever o node_modules
+    working_dir: /app
+    command: npm run dev -- --host
+
+
+  postgres:
+    image: postgres:latest
+    container_name: ecommerce-postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"
+    networks:
+      - ecommerce
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+networks:
+  ecommerce:
+    driver: bridge
