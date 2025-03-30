@@ -1,6 +1,7 @@
-package http
+package handler
 
 import (
+	"ecommerce/internal/adapter/http/cookie"
 	"ecommerce/internal/core/user"
 	"net/http"
 
@@ -38,15 +39,7 @@ func (h *UserHandler) login(c *gin.Context) {
 		return
 	}
 
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:     "auth_token",
-		Value:    token,
-		Path:     "/",
-		MaxAge:   3600,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	})
+	cookie.SetAuthCookie(c.Writer, token)
 
 	c.JSON(http.StatusOK, gin.H{"message": "login efetuado"})
 }

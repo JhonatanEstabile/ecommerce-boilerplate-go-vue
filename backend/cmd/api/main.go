@@ -3,7 +3,7 @@ package main
 import (
 	"ecommerce/internal/adapter/auth"
 	repo "ecommerce/internal/adapter/db"
-	adapter "ecommerce/internal/adapter/http"
+	"ecommerce/internal/adapter/http/handler"
 	"ecommerce/internal/core/product"
 	"ecommerce/internal/core/user"
 	"ecommerce/pkg/database"
@@ -27,21 +27,24 @@ func main() {
 	db := database.GetConnection()
 
 	r := gin.New()
-	r.Use(gin.Recovery()) // tratamento de panic
+
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"},
 		AllowCredentials: true,
-		AllowHeaders:     []string{"Content-Type"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Authorization", "Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"},
 	}))
+
+	r.Use(gin.Recovery()) // tratamento de panic
 
 	productRepo := repo.NewPostgresRepo(db)
 	service := product.NewService(productRepo)
-	productHandler := adapter.NewHandler(service)
+	productHandler := handler.NewHandler(service)
 	productHandler.Register(r)
 
 	userRepo := repo.NewUserRepo(db)
 	userService := user.NewService(userRepo, auth.NewAuth("aspdaskdpasd"))
-	userHandler := adapter.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService)
 	userHandler.RegisterRoutes(r)
 
 	r.GET("/ping", func(c *gin.Context) {

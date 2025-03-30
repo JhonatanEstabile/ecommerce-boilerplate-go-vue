@@ -1,6 +1,7 @@
-package http
+package handler
 
 import (
+	"ecommerce/internal/adapter/http/middleware"
 	"ecommerce/internal/core/product"
 	"net/http"
 	"strconv"
@@ -17,9 +18,14 @@ func NewHandler(s *product.Service) *Handler {
 }
 
 func (h *Handler) Register(r *gin.Engine) {
-	r.GET("/products", h.getAll)
-	r.POST("/products", h.create)
-	r.GET("/products/:id", h.getOne)
+	group := r.Group("/products")
+
+	group.Use(middleware.AuthMiddleare())
+	{
+		group.GET("/", h.getAll)
+		group.POST("/", h.create)
+		group.GET("/:id", h.getOne)
+	}
 }
 
 func (h *Handler) getAll(c *gin.Context) {

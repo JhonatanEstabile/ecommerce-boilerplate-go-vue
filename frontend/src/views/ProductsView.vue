@@ -1,7 +1,7 @@
 <script setup>
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import ProductFormModal from '@/components/ProductFormModal.vue';
-import axios from 'axios';
+import api from '../api/api';
 import { onMounted, ref } from 'vue';
 
 const product = ref({
@@ -15,7 +15,12 @@ const product = ref({
 const products = ref([]);
 
 const loadProducts = () => {
-  axios.get('http://localhost:8080/products').then((resp) => {
+  api.get(
+    '/products/',
+    {
+      withCredentials: true
+    }
+  ).then((resp) => {
     products.value = resp.data;
   }).catch((error) => {
     console.log(error);
@@ -37,7 +42,7 @@ const cleanformFields = () => {
 const handleSubmit = (event) => {
   event.preventDefault()
 
-  axios.post('http://localhost:8080/products', {
+  api.post('/products/', {
     name: product.value.name,
     description: product.value.description,
     price: product.value.price,
